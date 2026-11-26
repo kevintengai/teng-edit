@@ -10,15 +10,23 @@
       "from": 0,
       "durationInFrames": 120,
       "mode": "full",
-      "headline": "Masterclass",
-      "detail": "Claude + ChatGPT\nBuilding AI employees"
+      "scene": "press-proof",
+      "headline": "Pull a proof",
+      "detail": "One pass lays down the amber ink."
     }
   ],
   "captions": [
     {
-      "from": 15,
-      "durationInFrames": 72,
-      "text": "to help you run your business"
+      "from": 12,
+      "durationInFrames": 48,
+      "text": "Watch the roller",
+      "emphasis": ["roller"]
+    },
+    {
+      "from": 60,
+      "durationInFrames": 60,
+      "text": "The ink lands in register",
+      "emphasis": ["in register"]
     }
   ]
 }

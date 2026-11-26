@@ -4,6 +4,10 @@ Work from the generated project folder. Its `src/timeline.json` holds the cut li
 
 ## Inspect the recording
 
+For a folder request, use `new PROJECT --footage-dir FOLDER` from the installed skill. Use a separate destination for the edit. Open the project's `footage.json` to relate the copied takes to their original paths and inspect any detected silence. Treat file order as an assembly order. Use the actual delivery, slate, script, and any explicit ordering from the creator to choose the story.
+
+Get source-relative word timestamps for each speaking take. In Codex desktop, use Remotion Studio's local transcription action on each copied source and read its word-level caption JSON. An available local transcriber or a supplied timestamped transcript also works. Check names, numbers and soft words by listening. Choose the intended version of repeated lines. Use FFmpeg's quiet intervals as places to listen, then put the accepted trims into `cuts[]`. Retain breathing room at each end and any pause that carries a reaction. Audition the assembled dialogue before adding graphics or captions.
+
 Keep an untouched copy of every original. Put a copy of each approved source file under the generated project's `public/media/` folder. Keep separate camera takes and voice recordings under separate filenames. Inspect the tracks before choosing edit points.
 
 ```sh
@@ -21,6 +25,16 @@ All frame values are integers on the project `fps` clock. A range includes its s
 - `inserts[].from` and `captions[].from` refer to the final output clock. Sequence-local frame zero is the start of each animation. After changing an earlier cut, update later captions and inserts to match the spoken words.
 - To protect a word beginning, round a candidate source start down. To protect the end, round the source endpoint up within the available media, then listen. These are starting positions for review.
 
+## Caption the edited speech
+
+Retain the word transcripts alongside the project. For Remotion Caption arrays, the following command groups the words into short draft cues, skips removed passages, and relocates the retained words onto the edited clock. Supply one source ID and transcript path for each source used by the cuts. Times are source-relative `startMs` and `endMs`; keep the original whitespace in each token's `text`. Use an empty array for a silent source. Run the helper from the installed skill directory.
+
+```sh
+python scripts/caption_track.py "~/Videos/Edited project" --track take-01 "take-01.words.json" --track take-02 "take-02.words.json" --output "caption-draft.json"
+```
+
+Check the draft against playback and put the verified wording and timings in the project's `captions[]`. Set `emphasis` to the exact substring or substrings that should appear in amber. A cue such as `{"from":30,"durationInFrames":44,"text":"Right now we have three routes","emphasis":["three routes"]}` keeps the lead-in white. Keep related words and units together. Give one idea emphasis at a time and leave connective phrases white. The title card can display its headline in uppercase while spoken captions retain their natural spelling and case.
+
 ## Describe the edit
 
 | Field | Use |
@@ -30,7 +44,7 @@ All frame values are integers on the project `fps` clock. A range includes its s
 | `sources[]` | Each entry has a unique `id`, a `file` relative to `public/`, a `kind` of `video` or `audio`, and its `durationInFrames`. Use forward slashes in filenames. |
 | `cuts[]` | Each entry chooses `source`, `inFrame`, `outFrame` and `view`. Camera views optionally accept `fit` (`cover` or `contain`) and `focus` with `xPct` and `yPct`. The default centers a cover crop. |
 | `inserts[]` | Each entry has `from`, `durationInFrames`, `mode` (`full`, `overlay`, `split`, or `behind`) and `headline`. Optional fields include `detail`, a registered `scene` key, an overlay `box`, or split-specific `topPct` and `seamTitle`. |
-| `captions[]` | Each entry has output `from`, `durationInFrames` and `text`. Optional `topPct` sets vertical position on the canvas. Use a JSON newline escape for an intentional line break. Verify each phrase and its timing against the audio. |
+| `captions[]` | Each entry has output `from`, `durationInFrames` and `text`. Optional `emphasis` selects phrases for amber highlighting; `topPct` sets vertical position. Use a JSON newline escape for an intentional line break. |
 
 This example uses two independently timed source files. Replace the example names and timings with the actual recordings.
 
@@ -71,7 +85,7 @@ This edit lasts 270 frames. The first full-screen insert spans the source cut at
 - **Camera only.** Empty insert and caption arrays are valid.
 - **Inset or transparent overlay.** `box.leftPct` and `box.topPct` place the animation's top-left corner. `box.widthPct` scales both axes uniformly and preserves the composition's aspect ratio. The default box occupies 38% of the frame width at 55% from the left and 10% from the top. For a full-canvas transparent overlay, use 0, 0 and 100 with an animation that actually draws a transparent background.
 
-The base picture can be full-screen animation, camera, split, or a presenter over a background. Overlay inserts and captions sit above it. Captions use bold condensed white text, a dark outline and a shadow. The default caption top is 69.8% of the full frame. In split view it moves into the presenter panel. Adjust an individual caption's `topPct` when its words cover a face, screen label or hand movement.
+The base picture can be full-screen animation, camera, split, or a presenter over a background. Overlay inserts and captions sit above it. Captions use the bundled Anton face, white and amber text, a dark outline and a shadow. The default caption top is 71% of the full frame. In split view it moves into the presenter panel. Adjust an individual caption's `topPct` when its words cover a face, screen label or hand movement.
 
 Source audio remains on the original cut. Author insert components as silent visuals. To build a distinct beat, add an original component beside `src/look/Scene.tsx`. Import it in that file and add a named export such as `export const scenes = {comparison: ComparisonScene};`. Use `comparison` as the insert's `scene`. The saved style then carries both the component and its key to the next project. The default key is `look`. All scenes accept `headline`, optional `detail` and `durationInFrames`. Use the local Remotion frame to make each animation seekable during review.
 

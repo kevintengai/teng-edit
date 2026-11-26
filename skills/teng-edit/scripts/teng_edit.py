@@ -10,6 +10,7 @@ import sys
 import tempfile
 from pathlib import Path
 
+from footage import camera_files, quiet_passages
 from styles import CatalogError, capture, publish_new_dir
 
 SKILL = Path(__file__).resolve().parents[1]
@@ -38,7 +39,8 @@ def probe(path):
     streams = info.get("streams", [])
     video = next((s for s in streams if s.get("codec_type") == "video"
                   and not s.get("disposition", {}).get("attached_pic")), None)
-    audio = next((s for s in streams if s.get("codec_type") == "audio"), None)
+    audio_streams = [s for s in streams if s.get("codec_type") == "audio"]
+    audio = audio_streams[0] if audio_streams else None
     if not (video or audio):
         raise ValueError(f"No playable video or audio in {path.name}")
     duration = info.get("format", {}).get("duration")
@@ -54,8 +56,13 @@ def probe(path):
                         video.get("tags", {}).get("rotate", 0))
         if round(float(rotation) / 90) % 2:
             width, height = height, width
+    def start_time(stream):
+        value = stream.get("start_time")
+        return float(value) if value not in (None, "N/A") else 0.0
+
     return {"kind": "video" if video else "audio", "seconds": seconds, "width": width, "height": height,
-            "audioChannels": audio.get("channels", 0) if audio else 0}
+            "audioChannels": audio.get("channels", 0) if audio else 0, "audioStreamCount": len(audio_streams),
+            "audioStartSeconds": start_time(audio) - start_time(info.get("format", {})) if audio else 0.0}
 
 
 def dimensions(value):
@@ -108,15 +115,23 @@ def prepare_project(args):
     catalog = catalog_command(args)
     look = command_json([*catalog, "resolve", args.style, "--json"])
     media_paths = [p.expanduser().resolve() for p in (args.voiceover or args.media or [])]
-    inputs = [(path, probe(path)) for path in media_paths]
-    if args.layout and (not args.media or any(info["kind"] != "video" for _, info in inputs)):
+    folder = args.footage_dir.expanduser().resolve() if args.footage_dir is not None else None
+    if args.media and any(path.is_dir() for path in media_paths):
+        if len(media_paths) != 1:
+            raise ValueError("Supply one footage folder or an ordered list of media files.")
+        folder = media_paths[0]
+    if folder is not None and not folder.is_dir():
+        raise ValueError(f"Missing footage folder: {folder}")
+    entries = camera_files(folder) if folder is not None else [(p, None) for p in media_paths]
+    inputs = [(path, probe(path), relative) for path, relative in entries]
+    if args.layout and (args.voiceover or not inputs or any(info["kind"] != "video" for _, info, _ in inputs)):
         raise ValueError("A presenter layout needs camera footage in --media.")
     if args.key_color and args.layout != "green-screen":
         raise ValueError("Use --key-color with --layout green-screen.")
     # A creator can save their own incompatible revision under the same style ID.
-    bundled_layout = (args.layout and look["id"] == "midnight-signal"
-                      and look["revision"] == capture(DEMO_STYLE, omit_private=True)[0])
-    if args.voiceover and any(not info["audioChannels"] for _, info in inputs):
+    bundled_style = (look["id"] == "midnight-signal"
+                     and look["revision"] == capture(DEMO_STYLE, omit_private=True)[0])
+    if args.voiceover and any(not info["audioChannels"] for _, info, _ in inputs):
         raise ValueError("A voiceover input must contain an audio stream.")
     destination.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=destination.parent, prefix=".teng-edit-") as tmp:
@@ -128,12 +143,15 @@ def prepare_project(args):
         if not (look_path / "Scene.tsx").is_file():
             # A visual-only pack remains usable. Keep its references and identify the borrowed scaffold.
             fallback = look_path / "_starter"
-            shutil.copytree(DEMO_STYLE, fallback, ignore=shutil.ignore_patterns("STYLE.md", "reference.png"))
+            shutil.copytree(DEMO_STYLE, fallback, ignore=shutil.ignore_patterns("STYLE.md", "reference.png", "press-preview.png"))
             (look_path / "Scene.tsx").write_text("export {default} from './_starter/Scene';\n", encoding="utf-8")
             note["starter"] = "Borrowed midnight-signal scene; adapt it to the selected STYLE.md."
         write_json(work / "teng-style.json", note)
         timeline_path = work / "src" / "timeline.json"
         timeline = json.loads(timeline_path.read_text(encoding="utf-8-sig"))
+        if not inputs and not bundled_style:
+            for insert in timeline["inserts"]:
+                insert.pop("scene", None)
         if args.fps:
             timeline["fps"] = args.fps
         if args.size:
@@ -146,7 +164,9 @@ def prepare_project(args):
             public_media = work / "public" / "media"
             public_media.mkdir(parents=True, exist_ok=True)
             offset = 0
-            for index, (path, info) in enumerate(inputs, start=1):
+            footage = []
+            ffmpeg = shutil.which("ffmpeg") if folder is not None else None
+            for index, (path, info, relative) in enumerate(inputs, start=1):
                 source_id = f"take-{index:02d}"
                 filename = source_id + path.suffix.lower()
                 shutil.copy2(path, public_media / filename)
@@ -156,6 +176,12 @@ def prepare_project(args):
                 if args.layout == "green-screen":
                     source["chromaKey"] = {"color": args.key_color or "#00ff00"}
                 timeline["sources"].append(source)
+                if folder is not None:
+                    # Analyze the imported copy, which is also the file that the editor will play.
+                    analysis = quiet_passages(public_media / filename, timeline["fps"], frames,
+                                              info["audioStartSeconds"], info["audioStreamCount"], ffmpeg)
+                    footage.append({"source": source_id, "original": relative, "projectFile": source["file"],
+                                    "durationInFrames": frames, **analysis})
                 voice_only = bool(args.voiceover) or info["kind"] == "audio"
                 timeline["cuts"].append({"source": source_id, "inFrame": 0, "outFrame": frames,
                                          "view": "voiceover" if voice_only else "camera"})
@@ -167,10 +193,12 @@ def prepare_project(args):
                     insert = {"from": offset, "durationInFrames": frames, "mode": mode, "headline": "Your visual beat"}
                     if mode == "behind":
                         insert["presenterHeightPct"] = 75
-                    if bundled_layout:
+                    if bundled_style:
                         insert["scene"] = "readout" if mode == "behind" else "signal"
                     timeline["inserts"].append(insert)
                 offset += frames
+            if folder is not None:
+                write_json(work / "footage.json", {"fps": timeline["fps"], "sources": footage})
         write_json(timeline_path, timeline)
         if destination.exists() or destination.is_symlink():
             raise ValueError(f"Another project has appeared at {destination}")
@@ -187,6 +215,8 @@ def main():
     new.add_argument("--library", type=Path)
     media = new.add_mutually_exclusive_group()
     media.add_argument("--media", nargs="+", type=Path, metavar="FILE", help="Start a cut with these camera takes")
+    media.add_argument("--footage-dir", type=Path, metavar="FOLDER",
+                       help="Discover camera takes recursively, order filenames naturally, and measure long quiet passages")
     media.add_argument("--voiceover", nargs="+", type=Path, metavar="FILE", help="Use audio, including audio embedded in video")
     new.add_argument("--layout", choices=["split", "green-screen"],
                      help="Start camera takes with animation above or behind the presenter")

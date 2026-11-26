@@ -6,8 +6,9 @@ import * as THREE from 'three';
 import {buildPhoneSet} from './phone';
 import {Readout} from './Readout';
 import {SignalPath} from './SignalPath';
+import {PressProof} from './PressProof';
 
-export const scenes = {readout: Readout, signal: SignalPath};
+export const scenes = {readout: Readout, signal: SignalPath, 'press-proof': PressProof, 'signal-depth': PressProof};
 
 export type MidnightSignalProps = {
   headline: string;

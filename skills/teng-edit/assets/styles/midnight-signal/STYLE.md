@@ -1,10 +1,10 @@
 # Midnight signal
 
-Use this look when a viewer needs to see information travel or trigger a visible result. The style reference shows a navy handset on a night desk. The beveled rim, separate glass surface, dock and window frame give the camera four distances to move past. The screen remains the brightest large surface. The warm signal is the brightest small detail.
+Use this look when the speaker describes an action with a visible result. The [proof press](press-preview.png) shows amber ink landing on a sheet. The [handset](reference.png) shows information moving between stations on a screen. Both use deep navy materials, amber accents and cool white type.
 
 ## Use the starter
 
-The project starter copies the complete look into `src/look/`. When integrating manually, keep all the scene and helper files in this directory together. Mount the default component inside a Remotion `Sequence` and pass the sequence length as `durationInFrames`. The shot uses the sequence’s local frame. Dragging the playhead to a frame reproduces the same light position and camera angle.
+The project starter copies the complete look into `src/look/` and selects `press-proof` for its demo. To mount the handset manually, place the default component inside a Remotion `Sequence` and pass the sequence length as `durationInFrames`. Keep the scene and its helpers together. The shot uses the sequence’s local frame, so dragging the playhead reproduces the action at that instant.
 
 ```tsx
 <Sequence from={startFrame} durationInFrames={shotFrames}>
@@ -24,9 +24,20 @@ The component uses React, Remotion 4.0.534, `@remotion/three` 4.0.534, `@react-t
 
 Use the default `look` scene for a device demonstration. Use `readout` for a short result the speaker actually states. Put the value or phrase in `headline` and an optional context label in `detail`. The readout places cyan type near the top of a portrait background, leaving room for a keyed presenter. In a wide upper panel it centers the type above a moving amber light. For an upper-panel process diagram, choose `signal`. Give it a short headline and up to three newline-separated steps in `detail`. The amber light travels between the labeled nodes. All three scenes work in full-screen, split and behind-presenter layouts.
 
-## Shape the shot
+## Stage a print proof
 
-- **Materials.** Give each edge a reason to catch light. The starter separates the matte navy enclosure, narrow alloy rim, dark glass, side controls and black rubber cradle. On a different object, model fasteners, joints, contacts or other details that explain how someone would use it.
+Choose `press-proof` when the spoken beat is about printing, alignment, or checking a result. The orthographic camera looks straight down at a tabletop press. A roller travels across a sheet from left to right, laying down amber rings and bars. With no vanishing point, the viewer can compare the marks across the sheet throughout the stroke.
+
+Write a short headline in sentence case and put one supporting line in `detail`. Keep speech in the timeline caption lane, where each cue can highlight a different phrase. In the starter, the closing cue highlights “in register” as the printed marks become visible.
+
+```json
+{"from": 0, "durationInFrames": 120, "mode": "full", "scene": "press-proof",
+ "headline": "Pull a proof", "detail": "One pass lays down the amber ink."}
+```
+
+## Shape the handset shot
+
+- **Materials.** Give each edge a reason to catch light. The handset separates the matte navy enclosure, narrow alloy rim, dark glass, side controls and black rubber cradle. On a different object, model fasteners, joints, contacts or other details that explain how someone would use it.
 - **Color.** Start with a near-black room around `#081222`, navy screen tones from `#0b1728` to `#1e354d`, and cool white copy near `#f2f5f6`. Use muted cyan around `#8fcee4` for available stations. Amber around `#e7b36a` follows the active point. Give the signal a small bright core, a soft halo and a restrained horizontal flare.
 - **Depth.** Place a solid object in the near plane, the subject at reading distance and a dim window behind it. Move the camera slightly sideways during the forward push. The changing overlap between the handset and the window mullions makes the movement visible.
 - **Timing.** The opening 8% establishes the device. The amber core visits the center station, then reaches the far station at 82%. Let the viewer read the destination during the hold. Change these fractions to meet the syllable or action that matters in the actual clip.

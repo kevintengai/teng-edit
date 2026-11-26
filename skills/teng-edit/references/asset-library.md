@@ -9,6 +9,7 @@ Run these commands from the installed skill directory with Python 3.10 or newer.
 ```sh
 python scripts/styles.py list
 python scripts/styles.py find "navy handset"
+python scripts/styles.py find "proof press"
 python scripts/styles.py resolve midnight-signal --json
 ```
 
@@ -21,6 +22,8 @@ python scripts/teng_edit.py new "~/Videos/Desk film" --style midnight-signal
 ```
 
 In a project, `teng-style.json` records `pin` as `id@revision` and `path` as `src/look`. Keep both the record and the checked-out files with the edit. A project can also record a `starter` when it borrows a starter scene for a guidelines-only look. Read the pin from this file to reproduce an existing edit.
+
+With the dialogue cut in place, list the pictures it calls for and check which already exist in the selected look's scene registry. The built-in proof press has an overhead view of a working mechanism. Search other saved bundles by subject and action when a beat needs a different insert. Reuse a matching component with its local dependencies and record its source pin in the working look's guide. Keep the creator's actual words, client names and project-specific shots in the project. For changed or new reusable looks, save the project revision with the shortcut below.
 
 ## Save a new or revised look
 

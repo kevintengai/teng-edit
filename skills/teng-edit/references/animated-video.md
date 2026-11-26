@@ -1,6 +1,6 @@
 # Animated inserts and narration-led scenes
 
-Read the chosen look in `src/look/STYLE.md` and inspect its reference image before designing shots. The bundled phone is an editable starting point. Design the objects around what the speaker actually says.
+Read the chosen look in `src/look/STYLE.md` and inspect its reference images before designing shots. The bundled proof press shows a physical process. The handset can display a message or workflow. Choose objects that help explain what the speaker says.
 
 ## Turn speech into shots
 
@@ -12,7 +12,7 @@ Use the supplied scene component for beats it genuinely depicts. Build other bea
 
 ## Match the cinematic look
 
-Use midnight navy for depth, cobalt edges on physical objects, warm amber for the action the viewer follows and cyan for secondary information. Move a single bright point from a cable to a switch, across a route, or into a screen only when that movement explains the narration. Establish the object in its surroundings before moving into a close-up. Choose shots that remain legible at phone size with the sound off.
+Use midnight navy for depth, cobalt edges on physical objects, warm amber for the action the viewer follows and cyan for secondary information. Set the camera where the change is easiest to see. In the proof press demo, the overhead view lets the viewer watch the roller cross the paper and inspect the registration marks it leaves behind. Choose shots that remain legible at phone size with the sound off.
 
 Treat device content as editable text. Reserve a clear region for short captions below the visual action. Preserve sentence case, proper names and spoken comment keywords in quotation marks. Check title and caption contrast against the brightest frame of each moving shot. Use original designs and user-cleared assets.
 

@@ -50,8 +50,43 @@ const caption = z.strictObject({
   from: frame,
   durationInFrames: length,
   text,
+  emphasis: z.array(text).optional(),
   topPct: pct.optional(),
+}).superRefine((cue, ctx) => {
+  for (const [index, phrase] of (cue.emphasis ?? []).entries()) {
+    if (!captionRuns(cue.text, [phrase]).some(run => run.highlighted)) {
+      ctx.addIssue({code: 'custom', path: ['emphasis', index], message: 'Copy the emphasized words exactly from the caption text.'});
+    }
+  }
 });
+
+export function captionRuns(value: string, emphasis: readonly string[] = []) {
+  if (!emphasis.length) return [{text: value, highlighted: false}];
+  // Keep the source string intact, including spaces, punctuation and explicit line breaks.
+  const marked = new Uint8Array(value.length);
+  const boundaries = new Set<number>([value.length]);
+  for (const part of new Intl.Segmenter(undefined, {granularity: 'word'}).segment(value)) {
+    boundaries.add(part.index);
+  }
+  for (const phrase of emphasis) {
+    if (!phrase.length) continue;
+    let start = value.indexOf(phrase);
+    while (start !== -1) {
+      const end = start + phrase.length;
+      if (boundaries.has(start) && boundaries.has(end)) marked.fill(1, start, end);
+      start = value.indexOf(phrase, start + 1);
+    }
+  }
+  const runs: {text: string; highlighted: boolean}[] = [];
+  let from = 0;
+  for (let end = 1; end <= value.length; end++) {
+    if (end === value.length || marked[end] !== marked[from]) {
+      runs.push({text: value.slice(from, end), highlighted: Boolean(marked[from])});
+      from = end;
+    }
+  }
+  return runs;
+}
 
 const schema = z.strictObject({
   width: length,

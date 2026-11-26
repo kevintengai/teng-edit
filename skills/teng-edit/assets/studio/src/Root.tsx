@@ -1,9 +1,10 @@
 import React from 'react';
 import {AbsoluteFill, Composition, Html5Audio, OffthreadVideo, Sequence, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {KeyedPresenter} from './KeyedPresenter';
+import {displayFont, useDisplayFont} from './display-font';
 import * as look from './look/Scene';
 import raw from './timeline.json';
-import {readTimeline, type Insert, type SceneProps} from './timeline';
+import {captionRuns, readTimeline, type Insert, type SceneProps} from './timeline';
 
 // Keep optional insert variants with the reusable look so a saved bundle carries its own scene keys.
 const variants = 'scenes' in look ? look.scenes as Record<string, React.ComponentType<SceneProps>> : {};
@@ -75,19 +76,27 @@ function Caption({caption}: {caption: (typeof edit.captions)[number]}) {
   const {width, height} = useVideoConfig();
   const layout = usePresenterLayout(caption.from);
   const panelTop = layout?.mode === 'split' ? splitHeight(layout, height) : 0;
-  const captionTop = panelTop ? panelTop + (height - panelTop) * .60 : height * .698;
-  const captionSize = Math.round(Math.min(width * .0473, height * .084));
-  return <div style={{position: 'absolute', left: '8%', right: '8%', top: caption.topPct === undefined ? captionTop : `${caption.topPct}%`, textAlign: 'center',
-    color: 'white', fontFamily: 'Impact, "Arial Narrow", "Helvetica Neue Condensed", sans-serif',
-    fontWeight: 700, fontSize: captionSize, lineHeight: 1.1, whiteSpace: 'pre-line', textWrap: 'balance',
-    WebkitTextStroke: `${captionSize * .053}px #0b0c12`, paintOrder: 'stroke fill',
-    textShadow: '0 3px 8px #000, 0 0 16px #080d18'}}>
-    {caption.text}
+  const captionTop = panelTop ? panelTop + (height - panelTop) * .60 : height * .71;
+  const captionSize = Math.max(1, Math.round(Math.min(width * .0525, height * .084)));
+  const runs = React.useMemo(() => captionRuns(caption.text, caption.emphasis), [caption]);
+  return <div style={{position: 'absolute', left: '7%', right: '7%', top: caption.topPct === undefined ? captionTop : `${caption.topPct}%`, textAlign: 'center',
+    color: '#f7f8fa', fontFamily: displayFont, fontWeight: 400, fontSize: captionSize, lineHeight: 1.16,
+    whiteSpace: 'pre-wrap', textWrap: 'balance', overflowWrap: 'anywhere',
+    WebkitTextStroke: '.115em #080a11', paintOrder: 'stroke fill',
+    textShadow: '0 .06em .08em #03050a, 0 .02em .14em #03050a'}}>
+    {runs.map((run, index) =>
+      <span key={index} style={{color: run.highlighted ? '#ffba21' : undefined}}>{run.text}</span>
+    )}
   </div>;
 }
 
 const Edit: React.FC = () => {
-  return <AbsoluteFill style={{overflow: 'hidden', backgroundColor: '#080b10'}}>
+  const fontReady = useDisplayFont();
+  if (!fontReady) return null;
+  const style: React.CSSProperties & {'--teng-display-font': string} = {
+    overflow: 'hidden', backgroundColor: '#080b10', '--teng-display-font': displayFont,
+  };
+  return <AbsoluteFill style={style}>
     {edit.cuts.map(cut => (
       <Sequence key={cut.from} from={cut.from} durationInFrames={cut.durationInFrames}
         name={`${cut.media.id} [${cut.inFrame}, ${cut.outFrame})`} style={{zIndex: 1}}>
