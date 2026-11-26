@@ -1,0 +1,4 @@
+interface:
+  display_name: "teng-edit"
+  short_description: "Edit footage and build cinematic animations in Codex"
+  default_prompt: "Use $teng-edit to edit my footage, animate the visual beats and open the editable result in Codex."

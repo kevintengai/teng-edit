@@ -1,0 +1,24 @@
+{
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "durationInFrames": 120,
+  "sources": [],
+  "cuts": [],
+  "inserts": [
+    {
+      "from": 0,
+      "durationInFrames": 120,
+      "mode": "full",
+      "headline": "Masterclass",
+      "detail": "Claude + ChatGPT\nBuilding AI employees"
+    }
+  ],
+  "captions": [
+    {
+      "from": 15,
+      "durationInFrames": 72,
+      "text": "to help you run your business"
+    }
+  ]
+}
