@@ -143,7 +143,8 @@ def prepare_project(args):
         if not (look_path / "Scene.tsx").is_file():
             # A visual-only pack remains usable. Keep its references and identify the borrowed scaffold.
             fallback = look_path / "_starter"
-            shutil.copytree(DEMO_STYLE, fallback, ignore=shutil.ignore_patterns("STYLE.md", "reference.png", "press-preview.png"))
+            previews = shutil.ignore_patterns("STYLE.md", "reference.png", "handset-preview.png", "press-preview.png")
+            shutil.copytree(DEMO_STYLE, fallback, ignore=previews)
             (look_path / "Scene.tsx").write_text("export {default} from './_starter/Scene';\n", encoding="utf-8")
             note["starter"] = "Borrowed midnight-signal scene; adapt it to the selected STYLE.md."
         write_json(work / "teng-style.json", note)

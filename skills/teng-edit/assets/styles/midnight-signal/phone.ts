@@ -112,9 +112,11 @@ function printScreen(headline: string, detail: string) {
     const dark=c.createLinearGradient(0,texH,texW,0);
     dark.addColorStop(0,'#0b1728'); dark.addColorStop(.66,'#122238'); dark.addColorStop(1,'#1e354d');
     c.fillStyle=dark; c.fillRect(0,0,texW,texH);
-    label(c,'9:41',45,68,27,'#d8e3ee',700);
-    for(let i=0;i<4;i++){c.fillStyle='#ccdae5';c.fillRect(566+i*9,64-i*4,6,6+i*4)}
-    roundRect(c,620,46,42,18,4,'#c7d4df'); roundRect(c,665,50,3,10,1,'#c7d4df');
+    c.fillStyle = '#e5ad59';
+    c.beginPath();
+    c.arc(61, 130, 9, 0, Math.PI * 2);
+    c.fill();
+    label(c, 'Dock link', 84, 142, 34, '#cbdce6', 600);
     line(c,50,174,670,174,'#33475b',2);
     c.fillStyle='#e5ad59';c.fillRect(50,166,63,5);
     const head=fitLines(c,headline,615,2,84,700);
@@ -133,7 +135,6 @@ function printScreen(headline: string, detail: string) {
     });
     const body=fitLines(c,detail,615,3,58,600);
     body.lines.forEach((s,i)=>label(c,s,49,862+i*body.px*1.23,body.px,'#e1e8ed',600));
-    roundRect(c,267,1470,186,8,4,'#97aabd');
   });
 }
 
@@ -242,12 +243,32 @@ export function buildPhoneSet(scene: THREE.Scene, gl: THREE.WebGLRenderer, headl
   faceplate(device,1.210,2.505,.069,.024,.065,glass,.005);
   const displayMaterial=new THREE.MeshBasicMaterial({map:printScreen(headline,detail),transparent:true,toneMapped:false});
   add(device,new THREE.PlaneGeometry(screenW,screenH),displayMaterial,[0,0,displayZ]);
-  const island=faceplate(device,.278,.043,.018,.008,.103,charcoal,.004);island.position.y=1.138;
-  const lens=add(device,new THREE.CircleGeometry(.014,24),silver,[.085,1.138,.119]);
-  add(device,new THREE.CircleGeometry(.011,24),alloy(0x225773,.60,.13),[lens.position.x,lens.position.y,.121]);
-  slab(device,[.026,.125,.064],[-.631,.582,.021],silver,.008);
-  slab(device,[.026,.178,.064],[-.631,.361,.021],silver,.008);
-  slab(device,[.026,.252,.067],[.631,.43,.021],silver,.008);
+  // A milled speaker bridge and two mechanical keys make the docked unit operable with gloves.
+  slab(device, [1.10, .12, .045], [0, 1.153, .107], navy, .015);
+  for (let slot = 0; slot < 6; slot++) {
+    slab(device, [.025, .060, .007], [-.415 + slot * .055, 1.153, .132], charcoal, .005);
+  }
+  for (const x of [.33, .405]) {
+    add(device, new THREE.CircleGeometry(.024, 20), silver, [x, 1.153, .132]);
+    slab(device, [.026, .006, .005], [x, 1.153, .135], charcoal, .002);
+  }
+  slab(device, [1.10, .235, .044], [0, -1.065, .105], navy, .018);
+  for (const [x, name] of [[-.245, 'Back'], [.245, 'Select']] as const) {
+    slab(device, [.425, .154, .037], [x, -1.065, .142], glass, .016);
+    const legend = texture(256, 72, c => {
+      c.textAlign = 'center';
+      label(c, name, 128, 51, 46, '#d8e7ed', 600);
+    });
+    const marking = new THREE.MeshBasicMaterial({map: legend, transparent: true, toneMapped: false});
+    add(device, new THREE.PlaneGeometry(.33, .093), marking, [x, -1.065, .163]);
+  }
+  const selector = add(device, new THREE.CylinderGeometry(.082, .082, .066, 24), silver, [.637, .30, .019]);
+  selector.rotation.z = Math.PI / 2;
+  for (let rib = 0; rib < 12; rib++) {
+    const angle = rib * Math.PI / 6;
+    const ridge = slab(selector, [.010, .058, .009], [.082 * Math.sin(angle), 0, .082 * Math.cos(angle)], charcoal, .002);
+    ridge.rotation.y = angle;
+  }
   for(const side of [-1,1]) {
     for(let i=0;i<3;i++)slab(device,[.022,.006,.027],[side*(.20+i*.048),-1.276,-.004],charcoal,.0025);
     for(const y of [-.89,.92])slab(device,[.009,.016,.099],[side*.619,y,0],charcoal,.004);

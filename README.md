@@ -30,6 +30,8 @@ The starter demo looks straight down on a navy proof press. A roller crosses the
 
 <img src="skills/teng-edit/assets/styles/midnight-signal/press-preview.png" alt="An overhead view of a navy proof press printing amber registration marks on a sheet" width="270">
 
-<img src="skills/teng-edit/assets/styles/midnight-signal/reference.png" alt="A dark blue 3D phone showing a masterclass and an amber and cyan flow diagram" width="270">
+<img src="skills/teng-edit/assets/styles/midnight-signal/handset-preview.png" alt="A navy handset showing a print job ready to send to the press" width="270">
+
+Both preview images were rendered from the included scene code. The style guide lists the frame and settings for each. [Preview sources](skills/teng-edit/assets/styles/midnight-signal/STYLE.md#reproduce-the-preview-images)
 
 Remotion provides the editable timeline. FFmpeg handles media checks when useful. New styles live in a local versioned library and each project pins its chosen look. The creator reviews the current cut before approving a video export.

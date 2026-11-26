@@ -27,7 +27,9 @@ With the dialogue cut in place, list the pictures it calls for and check which a
 
 ## Save a new or revised look
 
-When a project introduces a look, edit its reusable files under `src/look/`. From the installed skill directory, save them and update the project's pin in one step.
+Keep supplied screenshots, reel frames and mood boards in the project's top-level `references/` folder. `save-style` snapshots the files under `src/look/`. Put the original scene and a still rendered from it there. In `STYLE.md`, record the scene, frame and inputs used for the preview. If the creator explicitly selects a third-party asset for the library, check that its license or permission covers the intended reuse and any redistribution. Record its source and include the required notices.
+
+From the installed skill directory, save the look and update the project's pin in one step.
 
 ```sh
 python scripts/teng_edit.py save-style "~/Videos/Desk film" --id desk-light
@@ -35,7 +37,7 @@ python scripts/teng_edit.py save-style "~/Videos/Desk film" --id desk-light
 
 For subsequent revisions of the same look, omit `--id`. The next project can select `--style desk-light` or an exact pin. To import a bundle that lives outside an edit project, use the catalog directly.
 
-1. Gather the reusable pieces in one dedicated folder. In `STYLE.md`, describe the visible result and how to reproduce it. Give the guide a descriptive Markdown heading. Include a representative still and any local dependencies used by reusable scene code.
+1. Gather the reusable scene files, rendered preview and dependencies in one dedicated folder, following the same source and permission guidance. Give `STYLE.md` a descriptive heading and explain how to reproduce the look.
 2. Keep raw recordings, private transcripts, client names and project-specific copy in the edit project. The tool copies regular files from the selected bundle, including nested assets. It skips version-control directories, dependency caches and local environment files. Review the chosen folder before saving.
 3. Save the folder with a descriptive ID and keep the returned pin. Pass the same ID to save a revision.
 

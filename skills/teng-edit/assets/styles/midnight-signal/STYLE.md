@@ -1,6 +1,6 @@
 # Midnight signal
 
-Use this look when the speaker describes an action with a visible result. The [proof press](press-preview.png) shows amber ink landing on a sheet. The [handset](reference.png) shows information moving between stations on a screen. Both use deep navy materials, amber accents and cool white type.
+Use this look when the speaker describes an action with a visible result. The proof press shows amber ink landing on a sheet. The handset shows a print job ready for the press. Both use deep navy materials, amber accents and cool white type.
 
 ## Use the starter
 
@@ -18,7 +18,18 @@ The project starter copies the complete look into `src/look/` and selects `press
 
 The sample props illustrate a client workflow. Replace both lines with the actual point the speaker makes. Aim for a headline of two to five words and a detail of one short sentence. The screen wraps and sizes the copy automatically. Omit `detail` when the headline carries the complete idea.
 
-The component uses React, Remotion 4.0.534, `@remotion/three` 4.0.534, `@react-three/fiber` 9.4.0 and Three.js 0.180.0 in the host project. The artwork and texture generators are local to this bundle. The screenshot is a visual comparison for the editor.
+The component uses React, Remotion 4.0.534, `@remotion/three` 4.0.534, `@react-three/fiber` 9.4.0 and Three.js 0.180.0 in the host project.
+
+## Reproduce the preview images
+
+Both PNGs come from the `TengEdit` composition at 1080 × 1920, 30 fps, with one full-screen insert starting at frame 0 and lasting 120 frames. Frame numbers are zero-based.
+
+| Preview | Scene source | Timeline settings |
+| --- | --- | --- |
+| [Proof press](press-preview.png) | `press-proof` in `PressProof.tsx` and `pressSet.ts` | Use the starter timeline as shipped, including captions. Capture frame 97. |
+| [Handset](handset-preview.png) | `look` in `Scene.tsx` and `phone.ts` | Set `headline` to `Job ready` and `detail` to `Send the approved proof to the press.` Set `captions` to `[]`. Capture frame 72. |
+
+The scene code builds the models and draws their textures. `Readout.tsx` draws the animated result and `SignalPath.tsx` draws the three-step diagram. The proof-press headline and dialogue captions use Anton by the Anton Project Authors. The generated project's `public/fonts/OFL.txt` contains the font's copyright notice and SIL Open Font License 1.1.
 
 ## Frame a presenter
 

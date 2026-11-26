@@ -1,6 +1,6 @@
 # Animated inserts and narration-led scenes
 
-Read the chosen look in `src/look/STYLE.md` and inspect its reference images before designing shots. The bundled proof press shows a physical process. The handset can display a message or workflow. Choose objects that help explain what the speaker says.
+Read `src/look/STYLE.md` and inspect its scene previews before designing shots. Use a supplied visual reference to identify the qualities the creator wants to carry over. Design the subject, composition and action around what the speaker says. The bundled proof press shows a physical process. The handset can display a message or workflow.
 
 ## Turn speech into shots
 
@@ -30,7 +30,7 @@ Studio prints a local URL. Open the composition in the Codex in-app browser and 
 
 Scrub the first and last frames, both sides of each cutaway, and the fastest camera move. Check a wide shot and a close-up at phone size, verify readable screen copy, and listen across speech cuts when playback is available. Report a measurement as a measurement. Stills, timeline playback, and a live Studio link support pre-export review.
 
-When an edit introduces or revises a look, save its reusable components, guide and reference assets in [the local style library](asset-library.md). Keep project-specific words in the timeline.
+When an edit introduces or revises a look, save the reusable components and a still rendered from the new scene. Record the frame in the style guide. Keep project-specific words in the timeline. [Local style library](asset-library.md)
 
 ## Export an approved cut
 
