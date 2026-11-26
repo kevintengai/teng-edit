@@ -29,8 +29,8 @@ All frame values are integers on the project `fps` clock. A range includes its s
 | `durationInFrames` | Required for an animation-only timeline. With source cuts, omit it for automatic duration or set it to their exact total. |
 | `sources[]` | Each entry has a unique `id`, a `file` relative to `public/`, a `kind` of `video` or `audio`, and its `durationInFrames`. Use forward slashes in filenames. |
 | `cuts[]` | Each entry chooses `source`, `inFrame`, `outFrame` and `view`. Camera views optionally accept `fit` (`cover` or `contain`) and `focus` with `xPct` and `yPct`. The default centers a cover crop. |
-| `inserts[]` | Each entry has `from`, `durationInFrames`, `mode` (`full` or `overlay`) and `headline`. Optional fields are `detail`, a registered `scene` key and an overlay `box`. |
-| `captions[]` | Each entry has output `from`, `durationInFrames` and `text`. Use a JSON newline escape for an intentional line break. Verify each phrase and its timing against the audio. |
+| `inserts[]` | Each entry has `from`, `durationInFrames`, `mode` (`full`, `overlay`, `split`, or `behind`) and `headline`. Optional fields include `detail`, a registered `scene` key, an overlay `box`, or split-specific `topPct` and `seamTitle`. |
+| `captions[]` | Each entry has output `from`, `durationInFrames` and `text`. Optional `topPct` sets vertical position on the canvas. Use a JSON newline escape for an intentional line break. Verify each phrase and its timing against the audio. |
 
 This example uses two independently timed source files. Replace the example names and timings with the actual recordings.
 
@@ -65,13 +65,13 @@ This edit lasts 270 frames. The first full-screen insert spans the source cut at
 
 ## Choose the picture and audio
 
-- **Talking head.** Use a video source with `view: "camera"` for the picture and its embedded audio. One playback element handles both. Select `contain` to show the full source frame or adjust `focus` to keep the speaker visible in a cover crop.
+- **Talking head.** Use a video source with `view: "camera"` for the picture and its embedded audio. The original take supplies speech across picture changes. Select `contain` to show the full source frame or adjust `focus` to keep the speaker visible in a cover crop. To put a graphic above or behind the speaker, use the [presenter layouts guide](presenter-layouts.md).
 - **Voiceover.** Use `view: "voiceover"` for an audio file or for a video's embedded narration. Each cut mounts one audio element. For an illustrated voiceover, cover the narration with full-screen inserts. Gaps show the dark base canvas.
 - **Animation only.** Leave `sources` and `cuts` empty and give the project an explicit duration. Keep `captions` empty unless the edit needs text.
 - **Camera only.** Empty insert and caption arrays are valid.
 - **Inset or transparent overlay.** `box.leftPct` and `box.topPct` place the animation's top-left corner. `box.widthPct` scales both axes uniformly and preserves the composition's aspect ratio. The default box occupies 38% of the frame width at 55% from the left and 10% from the top. For a full-canvas transparent overlay, use 0, 0 and 100 with an animation that actually draws a transparent background.
 
-The composition draws full-screen inserts first, overlay inserts next and captions last. Captions use bold condensed white text, a dark outline and a shadow. The default caption top is 69.8% of the frame height. If that covers a face, screen label or hand movement, reposition the caption in `src/Root.tsx` and check the new placement at phone size.
+The base picture can be full-screen animation, camera, split, or a presenter over a background. Overlay inserts and captions sit above it. Captions use bold condensed white text, a dark outline and a shadow. The default caption top is 69.8% of the full frame. In split view it moves into the presenter panel. Adjust an individual caption's `topPct` when its words cover a face, screen label or hand movement.
 
 Source audio remains on the original cut. Author insert components as silent visuals. To build a distinct beat, add an original component beside `src/look/Scene.tsx`. Import it in that file and add a named export such as `export const scenes = {comparison: ComparisonScene};`. Use `comparison` as the insert's `scene`. The saved style then carries both the component and its key to the next project. The default key is `look`. All scenes accept `headline`, optional `detail` and `durationInFrames`. Use the local Remotion frame to make each animation seekable during review.
 

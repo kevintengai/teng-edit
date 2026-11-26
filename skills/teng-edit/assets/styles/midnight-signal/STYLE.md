@@ -4,7 +4,7 @@ Use this look when a viewer needs to see information travel or trigger a visible
 
 ## Use the starter
 
-Copy `Scene.tsx` and `phone.ts` together into the host project. Mount the default component inside a Remotion `Sequence` and pass the sequence length as `durationInFrames`. The shot uses the sequence’s local frame. Dragging the playhead to a frame reproduces the same light position and camera angle.
+The project starter copies the complete look into `src/look/`. When integrating manually, keep all the scene and helper files in this directory together. Mount the default component inside a Remotion `Sequence` and pass the sequence length as `durationInFrames`. The shot uses the sequence’s local frame. Dragging the playhead to a frame reproduces the same light position and camera angle.
 
 ```tsx
 <Sequence from={startFrame} durationInFrames={shotFrames}>
@@ -18,7 +18,11 @@ Copy `Scene.tsx` and `phone.ts` together into the host project. Mount the defaul
 
 The sample props illustrate a client workflow. Replace both lines with the actual point the speaker makes. Aim for a headline of two to five words and a detail of one short sentence. The screen wraps and sizes the copy automatically. Omit `detail` when the headline carries the complete idea.
 
-The component uses React, Remotion 4.0.534, `@remotion/three` 4.0.534, `@react-three/fiber` 9.4.0 and Three.js 0.180.0 in the host project. The artwork and texture generators are local to the two source files. The screenshot is a visual comparison for the editor.
+The component uses React, Remotion 4.0.534, `@remotion/three` 4.0.534, `@react-three/fiber` 9.4.0 and Three.js 0.180.0 in the host project. The artwork and texture generators are local to this bundle. The screenshot is a visual comparison for the editor.
+
+## Frame a presenter
+
+Use the default `look` scene for a device demonstration. Use `readout` for a short result the speaker actually states. Put the value or phrase in `headline` and an optional context label in `detail`. The readout places cyan type near the top of a portrait background, leaving room for a keyed presenter. In a wide upper panel it centers the type above a moving amber light. For an upper-panel process diagram, choose `signal`. Give it a short headline and up to three newline-separated steps in `detail`. The amber light travels between the labeled nodes. All three scenes work in full-screen, split and behind-presenter layouts.
 
 ## Shape the shot
 

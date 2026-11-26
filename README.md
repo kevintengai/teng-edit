@@ -14,6 +14,10 @@ The edit workflow, animation workflow and local style library come in that one i
 
 > Use $teng-edit on this talking-head recording. Keep my voice underneath the cutaways, animate the product workflow when I explain it, and open the edit here for review.
 
+> Use $teng-edit. Start with me over the animated background, cut to the full-screen demo, then put the demo on top and me on the bottom while I explain the result.
+
+Split screen works with an ordinary camera recording. For a presenter in front of a moving background, use a green-screen take or a clip with transparency. You can resize the upper panel and add a short title across the divider. [See the presenter layouts](skills/teng-edit/references/presenter-layouts.md).
+
 > Use $teng-edit on this voiceover. Build a vertical animated explainer in the midnight-signal style and keep the final invitation on screen through the last word.
 
 > Use $teng-edit to save this revised animation look as a new style, then use that revision for my next video.

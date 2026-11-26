@@ -10,7 +10,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from styles import CatalogError, publish_new_dir
+from styles import CatalogError, capture, publish_new_dir
 
 SKILL = Path(__file__).resolve().parents[1]
 DEMO_STYLE = SKILL / "assets" / "styles" / "midnight-signal"
@@ -65,6 +65,12 @@ def dimensions(value):
     return tuple(int(v) for v in match.groups())
 
 
+def key_color(value):
+    if not re.fullmatch(r"#[0-9a-fA-F]{6}", value):
+        raise argparse.ArgumentTypeError("Use a sampled RGB hex color such as #24b84c.")
+    return value.lower()
+
+
 def catalog_command(args):
     command = [sys.executable, str(SKILL / "scripts" / "styles.py")]
     if args.library:
@@ -103,6 +109,13 @@ def prepare_project(args):
     look = command_json([*catalog, "resolve", args.style, "--json"])
     media_paths = [p.expanduser().resolve() for p in (args.voiceover or args.media or [])]
     inputs = [(path, probe(path)) for path in media_paths]
+    if args.layout and (not args.media or any(info["kind"] != "video" for _, info in inputs)):
+        raise ValueError("A presenter layout needs camera footage in --media.")
+    if args.key_color and args.layout != "green-screen":
+        raise ValueError("Use --key-color with --layout green-screen.")
+    # A creator can save their own incompatible revision under the same style ID.
+    bundled_layout = (args.layout and look["id"] == "midnight-signal"
+                      and look["revision"] == capture(DEMO_STYLE, omit_private=True)[0])
     if args.voiceover and any(not info["audioChannels"] for _, info in inputs):
         raise ValueError("A voiceover input must contain an audio stream.")
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -138,14 +151,25 @@ def prepare_project(args):
                 filename = source_id + path.suffix.lower()
                 shutil.copy2(path, public_media / filename)
                 frames = math.ceil(info["seconds"] * timeline["fps"])
-                timeline["sources"].append({"id": source_id, "file": "media/" + filename,
-                                            "kind": info["kind"], "durationInFrames": frames})
+                source = {"id": source_id, "file": "media/" + filename,
+                          "kind": info["kind"], "durationInFrames": frames}
+                if args.layout == "green-screen":
+                    source["chromaKey"] = {"color": args.key_color or "#00ff00"}
+                timeline["sources"].append(source)
                 voice_only = bool(args.voiceover) or info["kind"] == "audio"
                 timeline["cuts"].append({"source": source_id, "inFrame": 0, "outFrame": frames,
                                          "view": "voiceover" if voice_only else "camera"})
                 if voice_only:
                     timeline["inserts"].append({"from": offset, "durationInFrames": frames, "mode": "full",
                                                "headline": "Your narration", "detail": "Replace with the first visual beat"})
+                elif args.layout:
+                    mode = "behind" if args.layout == "green-screen" else "split"
+                    insert = {"from": offset, "durationInFrames": frames, "mode": mode, "headline": "Your visual beat"}
+                    if mode == "behind":
+                        insert["presenterHeightPct"] = 75
+                    if bundled_layout:
+                        insert["scene"] = "readout" if mode == "behind" else "signal"
+                    timeline["inserts"].append(insert)
                 offset += frames
         write_json(timeline_path, timeline)
         if destination.exists() or destination.is_symlink():
@@ -164,6 +188,10 @@ def main():
     media = new.add_mutually_exclusive_group()
     media.add_argument("--media", nargs="+", type=Path, metavar="FILE", help="Start a cut with these camera takes")
     media.add_argument("--voiceover", nargs="+", type=Path, metavar="FILE", help="Use audio, including audio embedded in video")
+    new.add_argument("--layout", choices=["split", "green-screen"],
+                     help="Start camera takes with animation above or behind the presenter")
+    new.add_argument("--key-color", type=key_color, metavar="#RRGGBB",
+                     help="Screen color for the green-screen layout, sampled from the footage")
     new.add_argument("--size", type=dimensions, help="Composition dimensions, for example 1080x1920")
     new.add_argument("--fps", type=int, choices=range(1, 121), metavar="1..120")
     save = commands.add_parser("save-style", help="Snapshot this project’s reusable look and record its exact revision")

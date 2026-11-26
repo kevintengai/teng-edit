@@ -4,6 +4,10 @@ import {ThreeCanvas} from '@remotion/three';
 import {useThree} from '@react-three/fiber';
 import * as THREE from 'three';
 import {buildPhoneSet} from './phone';
+import {Readout} from './Readout';
+import {SignalPath} from './SignalPath';
+
+export const scenes = {readout: Readout, signal: SignalPath};
 
 export type MidnightSignalProps = {
   headline: string;
